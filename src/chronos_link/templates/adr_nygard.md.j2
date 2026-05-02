@@ -1,0 +1,25 @@
+# ADR {{ id }}: {{ title }}
+
+## Status
+{{ status | default('Proposed') }}
+
+## Context
+{{ context }}
+
+## Decision
+{{ decision }}
+
+## Consequences
+This decision impacts the following architectural pillars:
+
+*   **Performance:** {{ performance | default('Neutral') }}
+*   **Scalability:** {{ scalability | default('Neutral') }}
+*   **Maintainability:** {{ maintainability | default('Neutral') }}
+*   **Cost:** {{ cost | default('Neutral') }}
+
+{% if diagram %}
+## Diagram
+```mermaid
+{{ diagram }}
+```
+{% endif %}

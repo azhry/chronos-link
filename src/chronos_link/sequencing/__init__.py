@@ -1,0 +1,1 @@
+"""ADR sequence management (placeholder)."""

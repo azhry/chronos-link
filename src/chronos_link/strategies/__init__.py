@@ -1,0 +1,1 @@
+"""Pluggable strategy pattern (placeholder)."""
