@@ -41,5 +41,14 @@ def get_llm(**kwargs: Any) -> Any:
             **kwargs
         )
     
+    elif provider == "openrouter":
+        from langchain_openai import ChatOpenAI
+        return ChatOpenAI(
+            model=model,
+            openai_api_key=settings.openrouter_api_key,
+            base_url="https://openrouter.ai/api/v1",
+            **kwargs
+        )
+    
     else:
         raise ValueError(f"Unsupported LLM provider: {provider}")

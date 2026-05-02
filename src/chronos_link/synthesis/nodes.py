@@ -36,9 +36,9 @@ async def actor_node(state: AgentState) -> dict:
     user_msg = prompts.ACTOR_USER_PROMPT.format(
         dna=dna_str,
         temporal=temporal_str,
+        strategy_hints=strategy_hints,
         critique=state.get("critique", "None"),
-        previous_draft=state.get("draft_adr", "None"),
-        strategy_hints=strategy_hints
+        previous_draft=state.get("draft_adr", "None")
     )
     
     messages = [
