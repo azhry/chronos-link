@@ -23,10 +23,6 @@ jobs:
       - name: Setup Python
         run: uv python install
 
-      - name: Install Chronos-Link Agent
-        # Fix: Using --system to allow global install in CI runner
-        run: uv pip install --system git+https://github.com/azhry/chronos-link.git
-
       - name: Synthesize ADR
         id: synthesis
         env:
@@ -34,11 +30,14 @@ jobs:
           LLM_PROVIDER: "openrouter"
           LLM_MODEL: "minimax/minimax-m2.5:free"
         run: |
-          chronos-link --workspace . --ci
+          # Use uv run to execute directly from your GitHub repository.
+          # This automatically creates a temporary environment.
+          uv run --with git+https://github.com/azhry/chronos-link.git chronos-link --workspace . --ci
           
+          # Find latest ADR and post as comment
           LATEST_ADR=$(ls -t docs/adr/*.md | head -n 1)
           echo "## ⏳ Chronos-Link: Architectural Intelligence" > comment_body.md
-          echo "Analysis performed using **Minimax M2.5** (OpenRouter)." >> comment_body.md
+          echo "Analysis performed using **Minimax M2.5** via OpenRouter." >> comment_body.md
           echo "" >> comment_body.md
           echo "---" >> comment_body.md
           cat "$LATEST_ADR" >> comment_body.md
