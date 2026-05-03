@@ -1,0 +1,70 @@
+name: Chronos-Link ADR Bot
+
+on:
+  pull_request:
+    # Trigger when the PR is closed
+    types: [closed]
+
+jobs:
+  analyze-on-merge:
+    # ONLY run if the PR was actually merged into the branch
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Required for Git history analysis
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+
+      - name: Setup Python
+        run: uv python install
+
+      - name: Synthesize ADR
+        id: synthesis
+        env:
+          # --- Configuration from your .env ---
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          LLM_PROVIDER: "openrouter"
+          LLM_MODEL: "minimax/minimax-m2.5:free"
+          PYTHONUNBUFFERED: "1"
+        run: |
+          # 1. Run the agent directly from source
+          uv run --with git+https://github.com/azhry/chronos-link.git chronos-link --workspace . --ci
+          
+          # 2. Locate the newest ADR and prepare the comment
+          LATEST_ADR=$(ls -t docs/adr/*.md | head -n 1)
+          echo "## ⏳ Chronos-Link: Post-Merge Architectural Record" > comment_body.md
+          echo "This PR has been merged. The agent has synthesized the final ADR for the repository history." >> comment_body.md
+          echo "Analysis performed using **Minimax M2.5** via OpenRouter." >> comment_body.md
+          echo "" >> comment_body.md
+          echo "---" >> comment_body.md
+          cat "$LATEST_ADR" >> comment_body.md
+          echo "" >> comment_body.md
+          echo "---" >> comment_body.md
+          echo "_Sent via [Chronos-Link](https://github.com/azhry/chronos-link) Bot by Azhry._" >> comment_body.md
+
+      - name: Post ADR as PR Comment
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          body-file: 'comment_body.md'
+
+      - name: Commit ADR to Repository
+        run: |
+          git config --global user.name "chronos-bot"
+          git config --global user.email "chronos-bot@users.noreply.github.com"
+          git add docs/adr/*.md
+          # Check if there are changes to commit to avoid errors
+          if git diff --staged --quiet; then
+            echo "No new ADR content to commit."
+          else
+            git commit -m "docs: auto-generate ADR for merged PR #${{ github.event.pull_request.number }}"
+            git push
+          fi
