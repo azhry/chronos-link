@@ -1,0 +1,54 @@
+name: Chronos-Link ADR Bot
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  analyze-architecture:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+
+      - name: Setup Python
+        run: uv python install
+
+      - name: Install Chronos-Link Agent
+        run: uv pip install git+https://github.com/azhry/chronos-link.git
+
+      - name: Synthesize ADR
+        id: synthesis
+        env:
+          # Match your .env exactly
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          LLM_PROVIDER: "openrouter"
+          LLM_MODEL: "minimax/minimax-m2.5:free"
+        run: |
+          chronos-link --workspace . --ci
+          
+          # Find latest ADR and post as comment
+          LATEST_ADR=$(ls -t docs/adr/*.md | head -n 1)
+          echo "## ⏳ Chronos-Link: Architectural Intelligence" > comment_body.md
+          echo "Analysis performed using **Minimax M2.5** (OpenRouter)." >> comment_body.md
+          echo "" >> comment_body.md
+          echo "---" >> comment_body.md
+          cat "$LATEST_ADR" >> comment_body.md
+          echo "" >> comment_body.md
+          echo "---" >> comment_body.md
+          echo "_Sent via [Chronos-Link](https://github.com/azhry/chronos-link) Bot by @azhry._" >> comment_body.md
+
+      - name: Post Comment
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          body-file: 'comment_body.md'
