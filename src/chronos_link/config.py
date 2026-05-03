@@ -16,6 +16,7 @@ class Settings(BaseSettings):
     llm_model: str = "gemini-2.0-flash"
     gemini_api_key: str = ""
     anthropic_api_key: str = ""
+    openrouter_api_key: str = ""
     ollama_base_url: str = "http://localhost:11434"
 
     # --- Workspace -----------------------------------------------------------

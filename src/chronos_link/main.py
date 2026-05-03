@@ -30,7 +30,7 @@ async def run_chronos_link_pipeline(root: Path, k: int):
     """Orchestrate all phases of the Chronos-Link-V1 pipeline."""
     # 1. Perception Layer
     if not settings.ci_mode:
-        typer.echo("[CHRONOS-LINK] [1/4] Probing environment...")
+        typer.echo(f"\n[CHRONOS-LINK] [1/4] Probing environment... (Using {settings.llm_provider.upper()}: {settings.llm_model})")
     dna = probe(root)
     if not settings.ci_mode:
         typer.echo(f"[CHRONOS-LINK] [OK] Detected stacks: {[s.stack_type.value for s in dna.signatures]}")
@@ -103,7 +103,7 @@ def generate(
     ] = settings.k_window,
     provider: Annotated[
         str,
-        typer.Option("--provider", "-p", help="LLM provider (google, ollama, anthropic)."),
+        typer.Option("--provider", "-p", help="LLM provider (google, ollama, anthropic, openrouter)."),
     ] = settings.llm_provider,
     model: Annotated[
         str,

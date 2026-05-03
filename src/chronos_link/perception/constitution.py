@@ -10,6 +10,8 @@ from pathlib import Path
 
 # File names recognised as a project constitution (checked in order).
 _CONSTITUTION_FILES: list[str] = [
+    "docs/adr/CONSTITUTION.md",
+    "CONSTITUTION.md",
     ".adr-rules",
     "PROMPT.md",
 ]
