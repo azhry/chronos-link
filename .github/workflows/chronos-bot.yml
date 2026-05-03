@@ -33,6 +33,7 @@ jobs:
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
           LLM_PROVIDER: "openrouter"
           LLM_MODEL: "minimax/minimax-m2.5:free"
+          PYTHONUNBUFFERED: "1"
         run: |
           # 1. Run the agent directly from source
           uv run --with git+https://github.com/azhry/chronos-link.git chronos-link --workspace . --ci
