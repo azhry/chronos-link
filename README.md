@@ -4,6 +4,7 @@
 
 # ⏳ Chronos-Link
 ### *Autonomous Architecture Documentation Agent*
+**Created by [Azhry](https://github.com/azhry)**
 
 **Chronos-Link** is an AI-powered agent designed to automate the creation of **Architecture Decision Records (ADRs)**. It doesn't just guess; it "probes" your project to understand your technology stack, scans your Git history to find the rationale for recent changes, and checks against your project's "Architectural Constitution" to ensure every decision is sound.
 
